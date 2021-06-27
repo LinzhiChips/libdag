@@ -1,0 +1,37 @@
+#
+# Copyright (C) 2021 Linzhi Ltd.
+#
+# This work is licensed under the terms of the MIT License.
+# A copy of the license can be found in the file COPYING.txt
+#
+
+NAME = libdag
+
+CFLAGS = -g -O9 -Wall -Wextra -Wshadow -Wno-unused-parameter \
+         -Wmissing-prototypes -Wmissing-declarations \
+	 -D_FILE_OFFSET_BITS=64 \
+	 -I../libcommon
+LDLIBS = -L. -Llinzhi -lcommon
+OBJS = keccak.o dag.o mine.o target.o mdag.o util.o dagio.o dagalgo.o
+
+
+include Makefile.c-common
+
+# ----- libdag.a --------------------------------------------------------------
+
+all::		| $(OBJDIR:%/=%)
+all::		$(OBJDIR)$(NAME).a
+
+$(OBJDIR:%/=%):
+		mkdir -p $@
+
+$(OBJDIR)$(NAME).a: $(OBJS_IN_OBJDIR)
+		$(BUILD) $(AR) cr $@ $^
+
+spotless::
+		rm -f $(OBJDIR)$(NAME).a
+
+# ----- Shared object files that are not in libdag ----------------------------
+
+clean::
+		rm -f $(OBJDIR)util.o

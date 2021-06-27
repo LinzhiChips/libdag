@@ -1,0 +1,13 @@
+libdag - Library for operations related to Ethash(-like) DAGs
+=============================================================
+
+Copyright (C) 2021 Linzhi Ltd.
+
+This work is licensed under the terms of the MIT License.
+A copy of the license can be found in the file COPYING.txt
+
+
+keccak.h and keccak.c are from libkeccak-tiny:
+Implementor: David Leon Gil
+License: CC0, attribution kindly requested. Blame taken too, but not liability.
+A copy of the CC0 license can be found in the file CC0.txt
