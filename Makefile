@@ -60,18 +60,3 @@ uninstall-host:
 
 uninstall-arm:
 		rm -f $(PREFIX)/include/linzhi/libdag-arm.a
-
-# ----- Sharing ---------------------------------------------------------------
-
-.PHONY:         share
-
-DEST = $(shell git rev-parse --show-toplevel)/../libdag
-MK_C = $(shell git rev-parse --show-toplevel)/common/Makefile.c-common
-
-share:		Makefile Makefile.target Makefile.core \
-		common.h dag.c dag.h keccak.c keccak.h mine.h mine.c \
-		target.c mdag.h mdag.c util.h util.c dagio.h dagio.c \
-		dagalgo.c dagalgo.h mixone.c check.c
-		cp $^ $(DEST)/
-		cp $(MK_C) $(DEST)/
-
