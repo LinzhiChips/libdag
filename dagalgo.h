@@ -13,18 +13,21 @@
 /*
  * Coin names:
  * etc		ETC
+ * ubq		UBQ
  * default	ETH, CLO, EXP, ...
  *
  * Algorithm names:
  * etchash
  * ethash
+ * ubqhash
  */
 
 
 enum dag_algo {
 	da_ethash	= 0,	/* Ethash */
 	da_etchash	= 1,	/* ETChash, ECIP-1099 */
-	dag_algos	= 2	/* must be last */
+	da_ubqhash = 2, /* UBQhash, UIP-1 */
+	dag_algos	= 3	/* must be last */
 };
 
 

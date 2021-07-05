@@ -52,6 +52,8 @@ int get_epoch(unsigned block_number)
 		return block_number / EPOCH_LENGTH;
 	case da_etchash:
 		return block_number / EPOCH_LENGTH / 2;
+	case da_ubqhash:
+		return block_number / EPOCH_LENGTH;
 	default:
 		abort();
 	}
@@ -95,6 +97,9 @@ void get_seedhash(uint8_t *seed, unsigned epoch)
 		break;
 	case da_etchash:
 		rounds = epoch * 2;
+		break;
+	case da_ubqhash:
+		rounds = epoch;
 		break;
 	default:
 		abort();
