@@ -123,9 +123,9 @@ void mkcache_init(uint8_t *cache, unsigned cache_bytes, const uint8_t *seed)
 	assert(n);
 
 	/* squentially produce the initial dataset */
-	KEC_512(cache, seed, 32); // TODO(iquidus): uip1 - ubqhash. BLAKE2B_512
+	KEC_512(cache, seed, 32); 
 	for (p = cache; p != cache + (n - 1) * HASH_BYTES; p += HASH_BYTES)
-		KEC_512(p + HASH_BYTES, p, HASH_BYTES); // TODO(iquidus): uip1 - ubqhash
+		KEC_512(p + HASH_BYTES, p, HASH_BYTES);
 }
 
 
@@ -145,7 +145,7 @@ void mkcache_round(uint8_t *cache, unsigned cache_bytes)
 		for (k = 0; k != HASH_BYTES; k++)
 			tmp[k] = cache[prev * HASH_BYTES + k] ^
 			    cache[v * HASH_BYTES + k];
-		KEC_512(p, tmp, HASH_BYTES); //TODO(iquidus): uip1 - ubqhash
+		KEC_512(p, tmp, HASH_BYTES);
 	}
 
 }
