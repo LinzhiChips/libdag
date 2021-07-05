@@ -11,3 +11,6 @@ keccak.h and keccak.c are from libkeccak-tiny:
 Implementor: David Leon Gil
 License: CC0, attribution kindly requested. Blame taken too, but not liability.
 A copy of the CC0 license can be found in the file CC0.txt
+
+blake2.h, blake2-impl.h and blake2b-ref.c are from ubqhash:
+https://github.com/ubiq/ubqhash originally from https://github.com/BLAKE2/BLAKE2
