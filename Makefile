@@ -33,7 +33,7 @@ spotless:
 PREFIX ?= /usr/local
 INSTALL ?= install
 
-INSTALL_INCLUDES = common.h dag.h keccak.h mine.h dagio.h dagalgo.h
+INSTALL_INCLUDES = common.h dag.h keccak.h blake2.h mine.h dagio.h dagalgo.h
 
 install:        install-host install-arm
 

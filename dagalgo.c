@@ -19,9 +19,10 @@
 
 
 #define	ETCHASH_EPOCH	390
-
+#define UBQHASH_EPOCH	22
 
 unsigned etchash_epoch = ETCHASH_EPOCH;
+unsigned ubqhash_epoch = UBQHASH_EPOCH;
 
 
 /* ----- Algorithm names --------------------------------------------------- */
@@ -34,6 +35,8 @@ const char *dagalgo_name(enum dag_algo algo)
 		return "ethash";
 	case da_etchash:
 		return "etchash";
+	case da_ubqhash:
+		return "ubqhash";
 	default:
 		fprintf(stderr, "unknown algorithm %u\n", algo);
 		abort();
@@ -47,6 +50,8 @@ int dagalgo_code(const char *name)
 		return da_ethash;
 	if (!strcmp(name, "etchash"))
 		return da_etchash;
+	if (!strcmp(name, "ubqhash"))
+		return da_ubqhash;
 	return -1;
 }
 
@@ -71,6 +76,16 @@ static enum dag_algo map_eth(unsigned *epoch)
 	return da_ethash;
 }
 
+/* ----- UBQ --------------------------------------------------------------- */
+
+
+static enum dag_algo map_ubq(unsigned *epoch)
+{
+	if (*epoch < ubqhash_epoch)
+		return da_ethash;
+	return da_ubqhash;
+}
+
 
 /* ----- Coin selection ---------------------------------------------------- */
 
@@ -82,6 +97,7 @@ struct coin {
 
 static struct coin coins[] = {
 	{ "etc",	map_etc },
+	{ "ubq",	map_ubq },
 	{ NULL,		map_eth },
 };
 

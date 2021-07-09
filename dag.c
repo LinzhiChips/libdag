@@ -15,6 +15,7 @@
 #include <assert.h>
 
 #include "keccak.h"
+#include "blake2.h"
 #include "common.h"
 #include "dagalgo.h"
 #include "dag.h"
@@ -52,6 +53,8 @@ int get_epoch(unsigned block_number)
 		return block_number / EPOCH_LENGTH;
 	case da_etchash:
 		return block_number / EPOCH_LENGTH / 2;
+	case da_ubqhash:
+		return block_number / EPOCH_LENGTH;
 	default:
 		abort();
 	}
@@ -96,6 +99,9 @@ void get_seedhash(uint8_t *seed, unsigned epoch)
 	case da_etchash:
 		rounds = epoch * 2;
 		break;
+	case da_ubqhash:
+		rounds = epoch;
+		break;
 	default:
 		abort();
 	}
@@ -117,7 +123,7 @@ void mkcache_init(uint8_t *cache, unsigned cache_bytes, const uint8_t *seed)
 	assert(n);
 
 	/* squentially produce the initial dataset */
-	KEC_512(cache, seed, 32);
+	KEC_512(cache, seed, 32); 
 	for (p = cache; p != cache + (n - 1) * HASH_BYTES; p += HASH_BYTES)
 		KEC_512(p + HASH_BYTES, p, HASH_BYTES);
 }
@@ -154,6 +160,56 @@ void mkcache(uint8_t *cache, unsigned cache_bytes, const uint8_t *seed)
 	/* use a low-round version of randmemohash */
 	for (i = 0; i != CACHE_ROUNDS; i++)
 		mkcache_round(cache, cache_bytes);
+}
+
+/* ----- Cache generation ubqhash ------------------------------------------- */
+
+
+void mkcache_init_ubqhash(uint8_t *cache, unsigned cache_bytes, const uint8_t *seed)
+{
+	unsigned n = cache_bytes / HASH_BYTES;
+	uint8_t *p;
+
+	assert(n);
+
+	/* squentially produce the initial dataset */
+	BLAKE2B_512(cache, seed, 32);
+	for (p = cache; p != cache + (n - 1) * HASH_BYTES; p += HASH_BYTES)
+		BLAKE2B_512(p + HASH_BYTES, p, HASH_BYTES);
+}
+
+
+void mkcache_round_ubqhash(uint8_t *cache, unsigned cache_bytes)
+{
+	unsigned n = cache_bytes / HASH_BYTES;
+	uint8_t *p;
+	unsigned j, k;
+	uint8_t tmp[HASH_BYTES];
+
+	for (j = 0; j != n; j++) {
+		p = cache + HASH_BYTES * j;
+
+		uint32_t prev = (j + n - 1) % n;
+		uint32_t v = read32(p) % n;
+
+		for (k = 0; k != HASH_BYTES; k++)
+			tmp[k] = cache[prev * HASH_BYTES + k] ^
+			    cache[v * HASH_BYTES + k];
+		BLAKE2B_512(p, tmp, HASH_BYTES);
+	}
+
+}
+
+
+void mkcache_ubqhash(uint8_t *cache, unsigned cache_bytes, const uint8_t *seed)
+{
+	unsigned i;
+
+	mkcache_init_ubqhash(cache, cache_bytes, seed);
+
+	/* use a low-round version of randmemohash */
+	for (i = 0; i != CACHE_ROUNDS; i++)
+		mkcache_round_ubqhash(cache, cache_bytes);
 }
 
 
