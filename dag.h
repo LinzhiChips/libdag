@@ -43,10 +43,6 @@ void mkcache_init(uint8_t *cache, unsigned cache_bytes, const uint8_t *seed);
 void mkcache_round(uint8_t *cache, unsigned cache_bytes);
 void mkcache(uint8_t *cache, unsigned cache_bytes, const uint8_t *seed);
 
-void mkcache_init_ubqhash(uint8_t *cache, unsigned cache_bytes, const uint8_t *seed);
-void mkcache_round_ubqhash(uint8_t *cache, unsigned cache_bytes);
-void mkcache_ubqhash(uint8_t *cache, unsigned cache_bytes, const uint8_t *seed);
-
 void calc_dataset_range(uint8_t *dag, unsigned start, unsigned lines,
     const uint8_t *cache, unsigned cache_bytes);
 void calc_dataset(uint8_t *dag, unsigned full_lines,

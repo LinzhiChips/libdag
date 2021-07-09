@@ -21,7 +21,18 @@
 #include "dag.h"
 
 
-enum dag_algo dag_algo;
+struct algo_ops {
+	void (*mkcache_init)(uint8_t *cache, unsigned cache_bytes,
+	    const uint8_t *seed);
+	void (*mkcache_round)(uint8_t *cache, unsigned cache_bytes);
+	void (*mkcache)(uint8_t *cache, unsigned cache_bytes,
+	    const uint8_t *seed);
+};
+
+
+enum dag_algo dag_algo = da_ethash;
+
+static const struct algo_ops algo_ops[];
 
 
 /* ----- Helper functions -------------------------------------------------- */
@@ -109,10 +120,11 @@ void get_seedhash(uint8_t *seed, unsigned epoch)
 }
 
 
-/* ----- Cache generation -------------------------------------------------- */
+/* ----- Cache generation Et(c)hash ---------------------------------------- */
 
 
-void mkcache_init(uint8_t *cache, unsigned cache_bytes, const uint8_t *seed)
+static void mkcache_init_ethash(uint8_t *cache, unsigned cache_bytes,
+    const uint8_t *seed)
 {
 	unsigned n = cache_bytes / HASH_BYTES;
 	uint8_t *p;
@@ -126,7 +138,7 @@ void mkcache_init(uint8_t *cache, unsigned cache_bytes, const uint8_t *seed)
 }
 
 
-void mkcache_round(uint8_t *cache, unsigned cache_bytes)
+static void mkcache_round_ethash(uint8_t *cache, unsigned cache_bytes)
 {
 	unsigned n = cache_bytes / HASH_BYTES;
 	uint8_t *p;
@@ -148,7 +160,8 @@ void mkcache_round(uint8_t *cache, unsigned cache_bytes)
 }
 
 
-void mkcache(uint8_t *cache, unsigned cache_bytes, const uint8_t *seed)
+static void mkcache_ethash(uint8_t *cache, unsigned cache_bytes,
+    const uint8_t *seed)
 {
 	unsigned i;
 
@@ -159,10 +172,11 @@ void mkcache(uint8_t *cache, unsigned cache_bytes, const uint8_t *seed)
 		mkcache_round(cache, cache_bytes);
 }
 
+
 /* ----- Cache generation ubqhash ------------------------------------------- */
 
 
-void mkcache_init_ubqhash(uint8_t *cache, unsigned cache_bytes,
+static void mkcache_init_ubqhash(uint8_t *cache, unsigned cache_bytes,
     const uint8_t *seed)
 {
 	unsigned n = cache_bytes / HASH_BYTES;
@@ -177,7 +191,7 @@ void mkcache_init_ubqhash(uint8_t *cache, unsigned cache_bytes,
 }
 
 
-void mkcache_round_ubqhash(uint8_t *cache, unsigned cache_bytes)
+static void mkcache_round_ubqhash(uint8_t *cache, unsigned cache_bytes)
 {
 	unsigned n = cache_bytes / HASH_BYTES;
 	uint8_t *p;
@@ -195,11 +209,11 @@ void mkcache_round_ubqhash(uint8_t *cache, unsigned cache_bytes)
 			    cache[v * HASH_BYTES + k];
 		BLAKE2B_512(p, tmp, HASH_BYTES);
 	}
-
 }
 
 
-void mkcache_ubqhash(uint8_t *cache, unsigned cache_bytes, const uint8_t *seed)
+static void mkcache_ubqhash(uint8_t *cache, unsigned cache_bytes,
+    const uint8_t *seed)
 {
 	unsigned i;
 
@@ -260,4 +274,47 @@ void calc_dataset(uint8_t *dag, unsigned full_lines,
     const uint8_t *cache, unsigned cache_bytes)
 {
 	calc_dataset_range(dag, 0, full_lines, cache, cache_bytes);
+}
+
+
+/* ----- Algorithm switch -------------------------------------------------- */
+
+
+static const struct algo_ops algo_ops[] = {
+	[da_ethash] = {
+		.mkcache_init	= mkcache_init_ethash,
+		.mkcache_round	= mkcache_round_ethash,
+		.mkcache	= mkcache_ethash,
+	},
+	[da_etchash] = {
+		.mkcache_init	= mkcache_init_ethash,
+		.mkcache_round	= mkcache_round_ethash,
+		.mkcache	= mkcache_ethash,
+	},
+	[da_ubqhash] = {
+		.mkcache_init	= mkcache_init_ubqhash,
+		.mkcache_round	= mkcache_round_ubqhash,
+		.mkcache	= mkcache_ubqhash,
+	},
+};
+
+
+/* ----- Cache generation API ---------------------------------------------- */
+
+
+void mkcache_init(uint8_t *cache, unsigned cache_bytes, const uint8_t *seed)
+{
+	algo_ops[dag_algo].mkcache_init(cache, cache_bytes, seed);
+}
+
+
+void mkcache_round(uint8_t *cache, unsigned cache_bytes)
+{
+	algo_ops[dag_algo].mkcache_round(cache, cache_bytes);
+}
+
+
+void mkcache(uint8_t *cache, unsigned cache_bytes, const uint8_t *seed)
+{
+	algo_ops[dag_algo].mkcache(cache, cache_bytes, seed);
 }
