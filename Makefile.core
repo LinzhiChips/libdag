@@ -12,7 +12,7 @@ CFLAGS = -g -O9 -Wall -Wextra -Wshadow -Wno-unused-parameter \
 	 -D_FILE_OFFSET_BITS=64 \
 	 -I../libcommon
 LDLIBS = -L. -Llinzhi -lcommon
-OBJS = keccak.o dag.o mine.o target.o mdag.o util.o dagio.o dagalgo.o
+OBJS = keccak.o blake2b-ref.o dag.o mine.o target.o mdag.o util.o dagio.o dagalgo.o
 
 
 include Makefile.c-common

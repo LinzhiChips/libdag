@@ -5,7 +5,7 @@
 # A copy of the license can be found in the file COPYING.txt
 #
 
-MKTGT = $(MAKE) -f Makefile.target
+MKTGT = $(MAKE) -f Makefile.core
 
 .PHONY:		all host arm clean spotless
 
@@ -33,7 +33,7 @@ spotless:
 PREFIX ?= /usr/local
 INSTALL ?= install
 
-INSTALL_INCLUDES = common.h dag.h keccak.h mine.h dagio.h dagalgo.h
+INSTALL_INCLUDES = common.h dag.h keccak.h blake2.h mine.h dagio.h dagalgo.h
 
 install:        install-host install-arm
 
@@ -69,9 +69,9 @@ DEST = $(shell git rev-parse --show-toplevel)/../libdag
 MK_C = $(shell git rev-parse --show-toplevel)/common/Makefile.c-common
 
 share:		Makefile Makefile.target Makefile.core \
-		common.h dag.c dag.h keccak.c keccak.h mine.h mine.c \
+		common.h dag.c dag.h keccak.c keccak.h blake2b-ref.c blake2.h mine.h mine.c \
 		target.c mdag.h mdag.c util.h util.c dagio.h dagio.c \
-		dagalgo.c dagalgo.h mixone.c check.c
+		dagalgo.c dagalgo.h
 		cp $^ $(DEST)/
 		cp $(MK_C) $(DEST)/
 
