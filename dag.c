@@ -50,11 +50,10 @@ int get_epoch(unsigned block_number)
 {
 	switch (dag_algo) {
 	case da_ethash:
+	case da_ubqhash:
 		return block_number / EPOCH_LENGTH;
 	case da_etchash:
 		return block_number / EPOCH_LENGTH / 2;
-	case da_ubqhash:
-		return block_number / EPOCH_LENGTH;
 	default:
 		abort();
 	}
@@ -94,13 +93,11 @@ void get_seedhash(uint8_t *seed, unsigned epoch)
 
 	switch (dag_algo) {
 	case da_ethash:
+	case da_ubqhash:
 		rounds = epoch;
 		break;
 	case da_etchash:
 		rounds = epoch * 2;
-		break;
-	case da_ubqhash:
-		rounds = epoch;
 		break;
 	default:
 		abort();
@@ -165,7 +162,8 @@ void mkcache(uint8_t *cache, unsigned cache_bytes, const uint8_t *seed)
 /* ----- Cache generation ubqhash ------------------------------------------- */
 
 
-void mkcache_init_ubqhash(uint8_t *cache, unsigned cache_bytes, const uint8_t *seed)
+void mkcache_init_ubqhash(uint8_t *cache, unsigned cache_bytes,
+    const uint8_t *seed)
 {
 	unsigned n = cache_bytes / HASH_BYTES;
 	uint8_t *p;

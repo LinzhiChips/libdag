@@ -14,3 +14,5 @@ A copy of the CC0 license can be found in the file CC0.txt
 
 blake2.h, blake2-impl.h and blake2b-ref.c are from ubqhash:
 https://github.com/ubiq/ubqhash originally from https://github.com/BLAKE2/BLAKE2
+License: CC0. Copyright 2012, Samuel Neves <sneves@dei.uc.pt>
+A copy of the CC0 license can be found in the file CC0.txt
