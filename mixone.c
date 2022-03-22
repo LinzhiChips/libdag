@@ -82,7 +82,8 @@ static void reverse_bytes(uint8_t *buf, unsigned bytes)
 
 
 static void doit(enum mode mode, unsigned n, const uint8_t *header_hash,
-    uint64_t nonce, unsigned pattern_bytes, uint8_t pattern[TARGET_BYTES])
+    uint64_t nonce, unsigned pattern_bytes, uint8_t pattern[TARGET_BYTES],
+    int exit_at)
 {
 	uint8_t *cache;
 	uint8_t seed[SEED_BYTES];
@@ -130,6 +131,8 @@ static void doit(enum mode mode, unsigned n, const uint8_t *header_hash,
 			dag_line = mix_dag_line(i, mix, s, dag_lines);
 			if (trace)
 				printf("DA%-2d 0x%07x\n", i + 1, dag_line);
+			if (exit_at == (int) i)
+				break;
 			calc_dataset_range(line, dag_line, 1, cache,
 			    cache_bytes);
 			mix_do_mix(mix, line);
@@ -179,7 +182,8 @@ static unsigned get_pattern(uint8_t *pattern, const char *s)
 static void usage(const char *name)
 {
 	fprintf(stderr,
-"usage: %s [-r] [-t] {-b block | -e epoch | dag_lines} header_hash nonce\n\n"
+"usage: %s [-R round] [-r] [-t] {-b block | -e epoch | dag_lines}\n"
+"       %*sheader_hash nonce\n\n"
 "  -b block\n"
 "      use real Ethash parameters, for given block.\n"
 "  -e epoch\n"
@@ -187,9 +191,11 @@ static void usage(const char *name)
 "  -p hex-byte,...\n"
 "      search for nonces matching the specified pattern\n"
 "  -q  quiet operation\n"
+"  -R round\n"
+"      exit at the specified round, before mixing\n"
 "  -r  byte-reverse the header hash\n"
 "  -t  trace DAG addresses over the mixing rounds\n"
-	    , name);
+	    , name, (int) strlen(name) + 1, "");
 	exit(1);
 }
 
@@ -203,16 +209,22 @@ int main(int argc, char **argv)
 	uint8_t pattern[TARGET_BYTES];
 	unsigned pattern_bytes = 0;
 	bool reverse = 0;
+	int exit_at = -1;
 	char *end;
 	int c;
 
-	while ((c = getopt(argc, argv, "bertp:q")) != EOF)
+	while ((c = getopt(argc, argv, "berR:tp:q")) != EOF)
 		switch (c) {
 		case 'b':
 			mode = mode_block;
 			break;
 		case 'e':
 			mode = mode_epoch;
+			break;
+		case 'R':
+			exit_at = strtol(optarg, &end, 0);
+			if (*end || exit_at < 0)
+				usage(*argv);
 			break;
 		case 'r':
 			reverse = 1;
@@ -247,7 +259,7 @@ int main(int argc, char **argv)
 	if (*end)
 		usage(*argv);
 
-	doit(mode, n, header_hash, nonce, pattern_bytes, pattern);
+	doit(mode, n, header_hash, nonce, pattern_bytes, pattern, exit_at);
 
 	return 0;
 }
