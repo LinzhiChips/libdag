@@ -49,6 +49,8 @@ void mix_setup(uint8_t *mix, uint8_t *s, const uint8_t *header_hash,
 	if (mine_trace)
 		dump_blob("Pre-KEC512", tmp, sizeof(tmp));
 	KEC_512(s, tmp, sizeof(tmp));
+	if (mine_trace)
+		dump_blob("Post-KEC512 (s)", s, HASH_BYTES);
 
 	/* start the mix with replicated s */
 	unsigned i;
