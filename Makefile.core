@@ -7,7 +7,7 @@
 
 NAME = libdag
 
-CFLAGS = -g -O9 -Wall -Wextra -Wshadow -Wno-unused-parameter \
+CFLAGS = -g -O9 -fPIC -Wall -Wextra -Wshadow -Wno-unused-parameter \
          -Wmissing-prototypes -Wmissing-declarations \
 	 -D_FILE_OFFSET_BITS=64 \
 	 -I../libcommon
